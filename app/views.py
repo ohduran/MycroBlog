@@ -2,20 +2,21 @@
 from flask import render_template, flash, redirect
 from flask import session, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, oid
-from .forms import LoginForm
+from app import app, db, lm
+from .forms import LoginForm, EditForm
 from .models import User
 from datetime import datetime
 
 
 @lm.user_loader
 def load_user(id):
-    """The function loads the user from the database."""
+    """Load the user from the database."""
     return User.query.get(int(id))  # Unicode converted into int
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Register functionality."""
     """GET"""
     form = LoginForm()
     if request.method == 'GET':
@@ -34,6 +35,7 @@ def register():
 
 @app.before_request
 def before_request():
+    """Set up a current user."""
     g.user = current_user
     if g.user.is_authenticated:
         g.user.last_seen = datetime.utcnow()
@@ -45,6 +47,7 @@ def before_request():
 @app.route('/index')
 @login_required
 def index():
+    """Index page."""
     user = current_user
     posts = [  # fake array of posts
         {
@@ -65,6 +68,7 @@ def index():
 @app.route('/user/<username>')
 @login_required
 def user(username):
+    """User page."""
     user = User.query.filter_by(username=username).first()
     if user is None or user == "":
         flash('User %s not found.' % username)
@@ -77,9 +81,10 @@ def user(username):
                             posts=posts)
 
 
-@app.route('/edit', methods = ['GET','POST'])
+@app.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
+    """Edit functionality."""
     form = EditForm()
     if form.validate_on_submit():
         g.user.username = form.username.data
@@ -96,6 +101,7 @@ def edit():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Log in functionality."""
     form = LoginForm()
     """GET"""
     if request.method == 'GET':
@@ -119,5 +125,19 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    """Log out functionality."""
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.errorhandler(404)
+def not_found_error(error):
+    """Error 404: Not found."""
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Error 500: Internal."""
+    db.session.rollback()  # roll back in ase a working session is needed
+    return render_template('500.html'), 500

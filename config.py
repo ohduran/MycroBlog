@@ -1,3 +1,4 @@
+"""Config file."""
 # CRSF configuration
 WTF_CSRF_ENABLED = False
 SECRET_KEY = 'very-hard-to-guess-key'
