@@ -4,6 +4,6 @@
     <h1>Hi, {{ user.username }}!</h1>
     {% endif %}
     {% for post in posts %}
-    <div><p>{{ post.author.nickname }} says: <b>{{ post.body }}</b></p></div>
+    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}
 {% endblock %}
