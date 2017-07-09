@@ -24,6 +24,19 @@ def register():
                                 title='Register',
                                 form=form)
     """POST"""
+    if request.method == 'POST':
+        # Look for the post information on the database
+        username_used = User.query.filter_by(
+            username=request.form['username']).first()
+        email_used = User.query.filter_by(
+            email=request.form['email']).first()
+        # If user already exists
+        if username_used is not None:
+            flash('Username already in use. Try a different username.')
+            return redirect(url_for('register'))
+        if email_used is not None:
+            flash('Email already in use. Try a different email.')
+            return redirect(url_for('register'))
     user = User(username=request.form['username'],
                 password=request.form['password'],
                 email=request.form['email'])
