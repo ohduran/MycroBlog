@@ -34,6 +34,7 @@ def register():
         if username_used is not None:
             flash('Username already in use. Try a different username.')
             return redirect(url_for('register'))
+        # If email already in use.
         if email_used is not None:
             flash('Email already in use. Try a different email.')
             return redirect(url_for('register'))

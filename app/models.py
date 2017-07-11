@@ -40,7 +40,7 @@ class User(db.Model):
 
     def __repr__(self):
         """Return username."""
-        return '<User %r>' % (self.nickname)
+        return '<User %r>' % (self.username)
 
 # Implement OAuth protocol following
 # https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
