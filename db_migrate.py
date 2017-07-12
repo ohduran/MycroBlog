@@ -1,4 +1,5 @@
-#!flask/bin/python
+"""Migrate database file."""
+# !flask/bin/python
 import imp
 from migrate.versioning import api
 from app import db

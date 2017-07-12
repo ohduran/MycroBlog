@@ -1,6 +1,20 @@
-"""Database structure."""
+"""
+Database structure.
+It is always best to move the logic of our application away from view functions
+and into models, because that simplifies the testing.
+"""
 from hashlib import md5
 from app import db
+
+# Auxiliary table that connects followers with followed users.
+# Both key point to users table.
+followers = db.Table('followers',
+                     db.Column('follower_id',
+                                db.Integer,
+                                db.ForeignKey('user.id')),
+                     db.Column('followed_id',
+                                db.Integer,
+                                db.ForeignKey('user.id')))
 
 
 class User(db.Model):
@@ -13,8 +27,21 @@ class User(db.Model):
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime)
     password = db.Column(db.String(10))
+    # define follow relationship
+    # Link User instances with other User instances.
+    # Convention: For a pair of users, left side is follower, right is followed
+    # When quering from the left, we will get the followed users.
+    followed = db.relationship('User',  # right side entity
+                               secondary=followers,  # association table
+                               # Condition that links left side to association
+                               primaryjoin=(followers.c.follower_id == id),
+                               # Condition that links right side to association
+                               secondaryjoin=(followers.c.followed_id == id),
+                               # How this will be accessed from right side
+                               backref=db.backref('followers', lazy='dynamic'),
+                               # Lazy means 'Not run until specified'
+                               lazy='dynamic')
 
-    @property
     def is_authenticated(self):
         """Flask requirement for authentication and security."""
         return True
@@ -29,6 +56,19 @@ class User(db.Model):
         """Flask requirement for authentication and security."""
         return False
 
+    @staticmethod
+    def make_unique_username(username):
+        """Avoid repetition of username in database by adding '2' to it."""
+        if User.query.filter_by(username=username).first() is None:
+            return username
+        version = 2
+        while True:
+            new_username = username + str(version)
+            if User.query.filter_by(username=new_username).first() is None:
+                break
+            version += 1
+        return new_username
+
     def get_id(self):
         """Get id of the user for database purposes."""
         return unicode(self.id)
@@ -41,6 +81,25 @@ class User(db.Model):
     def __repr__(self):
         """Return username."""
         return '<User %r>' % (self.username)
+
+    # Add and remove Follower relationships.
+    def is_following(self, user):
+        """Is self following user."""
+        # Check if the associated table includes a self -> user row.
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
+
+    def follow(self, user):
+        """Make self follow user."""
+        if not self.is_following(user):
+            self.followed.append(user)
+            return self
+
+    def unfollow(self, user):
+        """Make self unfollow user."""
+        if self.is_following(user):
+            self.followed.remove(user)
+            return self
 
 # Implement OAuth protocol following
 # https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
