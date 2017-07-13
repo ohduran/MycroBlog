@@ -139,6 +139,48 @@ def login():
     return redirect(url_for('index'))
 
 
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    """Follow a user."""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User %s not found.' % username)
+        return redirect(url_for('index'))
+    elif user == g.user:
+        flash('You can\'t follow yourself!')
+        return redirect(url_for('user', username=username))
+    u = g.user.follow(user)
+    if u is None:
+        flash('Cannot follow ' + username + '!')
+        return redirect(url_for('user', username=username))
+    db.session.add(u)
+    db.session.commit()
+    flash('You are now following ' + username + '!')
+    return redirect(url_for('user', username=username))
+
+
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    """Unfollow a user."""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User %s not found.' % username)
+        return redirect(url_for('index'))
+    if user == g.user:
+        flash('You can\'t unfollow yourself!')
+        return redirect(url_for('user', username=username))
+    u = g.user.unfollow(user)
+    if u is None:
+        flash('Cannot unfollow ' + username + '.')
+        return redirect(url_for('user', username=username))
+    db.session.add(u)
+    db.session.commit()
+    flash('You have stopped following ' + username + '.')
+    return redirect(url_for('user', username=username))
+
+
 @app.route('/logout')
 @login_required
 def logout():
