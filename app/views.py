@@ -43,6 +43,9 @@ def register():
                 email=request.form['email'])
     db.session.add(user)
     db.session.commit()
+    user.follow(user)
+    db.session.add(user)
+    db.session.commit()
     flash('User successfully registered')
     return redirect(url_for('login'))
 

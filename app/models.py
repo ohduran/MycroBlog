@@ -96,10 +96,23 @@ class User(db.Model):
             return self
 
     def unfollow(self, user):
-        """Make self unfollow user."""
-        if self.is_following(user):
+        """Make self unfollow user. User cannot unfollow himself."""
+        if self.is_following(user) and user is not self:
             self.followed.remove(user)
             return self
+
+    # Relational databases work really well with querying posts
+    # for followed users.
+    def get_followed_posts(self):
+        """Get followed posts."""
+        return Post.query.join(  # join will concatenate Post with :
+            followers,  # associated followers table
+            # condition: followed id is the user id
+            (followers.c.followed_id == Post.user_id)).filter(
+                # On that temporary table, filter user_id = self.id
+                followers.c.follower_id == self.id).order_by(
+                    # order by timestamp in descending order (latest first)
+                    Post.timestamp.desc())
 
 # Implement OAuth protocol following
 # https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
