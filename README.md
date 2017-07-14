@@ -12,6 +12,8 @@ Only upon logging into the system, the user will be able to access index.
 - User can display an "about me" section and edit it.
 - User can log out from any page when logged in.
 - User can follow and unfollow other users. By default, user follows himself.
+- User can post posts.
+- User can see followed users' posts.
 
 ## Test cases
 
