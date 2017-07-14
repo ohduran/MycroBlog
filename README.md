@@ -11,13 +11,13 @@ Only upon logging into the system, the user will be able to access index.
 - User can see their own posts in the user page.
 - User can display an "about me" section and edit it.
 - User can log out from any page when logged in.
+- User can follow and unfollow other users. By default, user follows himself.
 
 ## Test cases
 
 As the application grows in size it gets more and more difficult to ensure code changes don't break functionality.
 
 Each test described in tests.py runs a focused part of the project and verifies that the result obtained is the expected one.
-When the test coverage is large, modifications and additions are assumed not to affect the application by running the tests.
 
 - Test user is added into the database correctly
 - Test user is not duplicated in database

@@ -95,13 +95,13 @@ class BaseTest(unittest.TestCase):
                           msg='Follow test failed.')
         self.assertTrue(u.followed.count() == 2,  # himself and V
                           msg='Follow test failed.')
-        self.assertTrue(u.followed.first().username == test_username_1,
+        self.assertTrue(u.followed.first().username == u.username,
                           msg='Follow test failed.')
         # Create test for confirming U follows V.
         # TO DO
         self.assertTrue(v.followers.count() == 2,
                           msg='Follow test failed.')
-        self.assertTrue(v.followers.first().username == test_username_2,
+        self.assertTrue(v.followers.first().username == v.username,
                           msg='Follow test failed.')
         # Create test for confirming V follows U.
         # TO DO
