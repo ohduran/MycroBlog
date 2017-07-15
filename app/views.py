@@ -6,6 +6,7 @@ from app import app, db, lm
 from .forms import LoginForm, EditForm, PostForm
 from .models import User, Post
 from datetime import datetime
+from config import POSTS_PER_PAGE
 
 
 @lm.user_loader
@@ -62,8 +63,9 @@ def before_request():
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+@app.route('/index/<int:page>', methods=['GET', 'POST'])
 @login_required
-def index():
+def index(page=1):
     """Index page."""
     user = current_user
     form = PostForm()
@@ -75,17 +77,10 @@ def index():
         db.session.commit()
         flash('Your post has been sent!')
         return redirect(url_for('index'))
-    # posts = [  # fake array of posts
-    #     {
-    #         'author': {'username': 'John'},
-    #         'body': 'Beautiful day in Portland!'
-    #     },
-    #     {
-    #         'author': {'username': 'Susan'},
-    #         'body': 'The Avengers movie was so cool!'
-    #     }
-    # ]
-    posts = user.get_followed_posts().all()
+
+    # page number, items per page, False means no error, just empty list.
+    posts = user.get_followed_posts().paginate(
+        page, POSTS_PER_PAGE, False)
     return render_template("index.html",
                            title='Home',
                            user=user,
@@ -94,16 +89,18 @@ def index():
 
 
 @app.route('/user/<username>')
+@app.route('/user/<username>/<int:page>')
 @login_required
-def user(username):
+def user(username, page=1):
     """User page."""
     user = User.query.filter_by(username=username).first()
     if user is None or user == "":
         flash('User %s not found.' % username)
         return redirect(url_for('index'))
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}]
+    # posts = [
+    #     {'author': user, 'body': 'Test post #1'},
+    #     {'author': user, 'body': 'Test post #2'}]
+    posts = user.posts.paginate(page, POSTS_PER_PAGE, False)
     return render_template('user.html',
                             user=user,
                             posts=posts)

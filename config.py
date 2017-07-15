@@ -21,3 +21,6 @@ MAIL_PASSWORD = None
 # administrator list
 
 ADMINS = ['alvaro.duranb@gmail.com']
+
+# Pagination
+POSTS_PER_PAGE = 3
