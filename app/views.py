@@ -6,7 +6,7 @@ from app import app, db, lm
 from .forms import LoginForm, EditForm, PostForm, SearchForm
 from .models import User, Post
 from datetime import datetime
-from config import POSTS_PER_PAGE
+from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS
 
 
 @lm.user_loader
@@ -115,6 +115,16 @@ def search():
         return redirect(url_for('index'))
     return redirect(url_for('search_results',
                             query=current_user.search_form.search.data))
+
+
+@app.route('/search_results/<query>')
+@login_required
+def search_results(query):
+    """Search Results page."""
+    results = Post.query.whoosh_search(query, MAX_SEARCH_RESULTS).all()
+    return render_template('search_results.html',
+                            query=query,
+                            results=results)
 
 
 @app.route('/edit', methods=['GET', 'POST'])
