@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect
 from flask import session, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
-from .forms import LoginForm, EditForm, PostForm
+from .forms import LoginForm, EditForm, PostForm, SearchForm
 from .models import User, Post
 from datetime import datetime
 from config import POSTS_PER_PAGE
@@ -55,10 +55,11 @@ def register():
 def before_request():
     """Set up a current user."""
     g.user = current_user
-    if g.user.is_authenticated:
-        g.user.last_seen = datetime.utcnow()
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
+        current_user.search_form = SearchForm()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -104,6 +105,16 @@ def user(username, page=1):
     return render_template('user.html',
                             user=user,
                             posts=posts)
+
+
+@app.route('/search', methods=['POST'])
+@login_required
+def search():
+    """Search engine."""
+    if not current_user.search_form.validate_on_submit():
+        return redirect(url_for('index'))
+    return redirect(url_for('search_results',
+                            query=current_user.search_form.search.data))
 
 
 @app.route('/edit', methods=['GET', 'POST'])

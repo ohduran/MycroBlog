@@ -27,3 +27,4 @@ POSTS_PER_PAGE = 3
 
 # Text search in WhooshAlchemy
 WHOOSH_BASE = os.path.join(basedir, 'search.db')
+MAX_SEARCH_RESULTS = 50

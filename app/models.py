@@ -4,8 +4,13 @@ It is always best to move the logic of our application away from view functions
 and into models, because that simplifies the testing.
 """
 from hashlib import md5
-from app import db
-
+from app import db, app
+import sys
+if sys.version_info >= (3, 0):
+    enable_search = False
+else:
+    enable_search = True
+    import flask_whooshalchemy as whooshalchemy
 # Auxiliary table that connects followers with followed users.
 # Both key point to users table.
 followers = db.Table('followers',
@@ -121,6 +126,8 @@ class User(db.Model):
 class Post(db.Model):
     """Post database structure."""
 
+    __searchable__ = ['body']
+
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime)
@@ -129,3 +136,8 @@ class Post(db.Model):
     def __repr__(self):
         """Print post."""
         return '<Post %r>' % (self.body)
+
+
+# If Python is less than 3.0
+if enable_search:
+    whooshalchemy.whoosh_index(app, Post)

@@ -23,3 +23,9 @@ class PostForm(FlaskForm):
     """Add a post as a user."""
 
     post = StringField('post', validators=[DataRequired()])
+
+
+class SearchForm(FlaskForm):
+    """Search a post from a user."""
+
+    search = StringField('search', validators=[DataRequired()])
