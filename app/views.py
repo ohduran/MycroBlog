@@ -5,6 +5,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
 from .forms import LoginForm, EditForm, PostForm, SearchForm
 from .models import User, Post
+from .emails import follower_notification
 from datetime import datetime
 from config import POSTS_PER_PAGE, MAX_SEARCH_RESULTS
 
@@ -186,6 +187,8 @@ def follow(username):
     db.session.add(u)
     db.session.commit()
     flash('You are now following ' + username + '!')
+    # TO BE DEBUGGED
+    # follower_notification(user, current_user)
     return redirect(url_for('user', username=username))
 
 

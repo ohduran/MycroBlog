@@ -13,14 +13,17 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Mail server settings
 
-MAIL_SERVER = 'localhost'
-MAIL_PORT = 25
-MAIL_USERNAME = None
-MAIL_PASSWORD = None
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USE_TSL = False
+MAIL_USE_SSL = True
+MAIL_DEFAULT_SENDER = 'mycroblogduran@gmail.com'
+MAIL_USERNAME = os.environ.get('mycroblogduran@gmail.com')
+MAIL_PASSWORD = os.environ.get('09111991')
 
 # administrator list
 
-ADMINS = ['alvaro.duranb@gmail.com']
+ADMINS = ['mycroblogduran@gmail.com']
 
 # Pagination
 POSTS_PER_PAGE = 3
