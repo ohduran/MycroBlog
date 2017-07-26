@@ -3,3 +3,4 @@
 - Create blocking list of users.
 - Debug the email servicing (views.py, line 190).
 - Create tests for email servicing.
+- Search results doesn't work properly
